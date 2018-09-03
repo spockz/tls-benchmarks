@@ -1,0 +1,96 @@
+Using OpenSSL Binary /usr/local/Cellar/openssl/1.0.2o_2/bin/openssl, override with $OPENSSL_COMMAND
+Running benchmarks with OpenSSL version OpenSSL 1.0.2o  27 Mar 2018
+
+The X/user sec metric means X connections per second spend in user mode. This is excluding the kernel time. The first
+value is more interesting, it shows the total amount of connections established in 30 seconds wall-clock time. Using
+OpenSSL is distinctly better than using Java 10, which again is better twice as good as using Java 8.
+
+Undertow Java 8
+Starting server /usr/libexec/java_home -v 1.8 --exec java -jar tls-undertow/target/tls-undertow-*.jar
+Waiting 5s to give application time to start
+Starting Benchmarks
+bio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+1249 connections in 0.54s; 2312.96 connections/user sec, bytes read 0
+nio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+1284 connections in 0.54s; 2377.78 connections/user sec, bytes read 0
+bio, no specific cipher
+No CIPHER specified
+1291 connections in 0.54s; 2390.74 connections/user sec, bytes read 0
+nio, no specific cipher
+No CIPHER specified
+1299 connections in 0.54s; 2405.56 connections/user sec, bytes read 0
+
+Undertow Java 10
+Starting server /usr/libexec/java_home -v 10 --exec java -jar tls-undertow/target/tls-undertow-*.jar
+Waiting 5s to give application time to start
+Starting Benchmarks
+bio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+2150 connections in 0.90s; 2388.89 connections/user sec, bytes read 0
+nio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+2260 connections in 0.93s; 2430.11 connections/user sec, bytes read 0
+bio, no specific cipher
+No CIPHER specified
+2250 connections in 0.94s; 2393.62 connections/user sec, bytes read 0
+nio, no specific cipher
+No CIPHER specified
+2269 connections in 0.93s; 2439.78 connections/user sec, bytes read 0
+
+Tomcat Java 8
+Starting server /usr/libexec/java_home -v 1.8 --exec java -jar tls-tomcat/target/tls-tomcat-*.jar
+Waiting 5s to give application time to start
+Starting Benchmarks
+bio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+1266 connections in 0.53s; 2388.68 connections/user sec, bytes read 0
+nio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+1292 connections in 0.54s; 2392.59 connections/user sec, bytes read 0
+bio, no specific cipher
+No CIPHER specified
+1306 connections in 0.54s; 2418.52 connections/user sec, bytes read 0
+nio, no specific cipher
+No CIPHER specified
+1307 connections in 0.54s; 2420.37 connections/user sec, bytes read 0
+
+Tomcat Java 10
+Starting server /usr/libexec/java_home -v 10 --exec java -jar tls-tomcat/target/tls-tomcat-*.jar
+Waiting 5s to give application time to start
+Starting Benchmarks
+bio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+2200 connections in 0.92s; 2391.30 connections/user sec, bytes read 0
+nio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+2280 connections in 0.93s; 2451.61 connections/user sec, bytes read 0
+bio, no specific cipher
+No CIPHER specified
+2265 connections in 0.94s; 2409.57 connections/user sec, bytes read 0
+nio, no specific cipher
+No CIPHER specified
+2271 connections in 0.94s; 2415.96 connections/user sec, bytes read 0
+
+Tomcat TCNative Java 8
+Starting server /usr/libexec/java_home -v 1.8 --exec java -Djava.library.path=/Users/alessandro/Downloads/tomcat-native-1.2.17-src/native/.libs -jar tls-tomcat/target/tls-tomcat-*.jar
+Waiting 5s to give application time to start
+Starting Benchmarks
+bio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+6229 connections in 2.58s; 2414.34 connections/user sec, bytes read 0
+nio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+6204 connections in 2.59s; 2395.37 connections/user sec, bytes read 0
+bio, no specific cipher
+No CIPHER specified
+6269 connections in 2.62s; 2392.75 connections/user sec, bytes read 0
+nio, no specific cipher
+No CIPHER specified
+6208 connections in 2.57s; 2415.56 connections/user sec, bytes read 0
+
+Tomcat TCNative Java 10
+Starting server /usr/libexec/java_home -v 10 --exec java -Djava.library.path=/Users/alessandro/Downloads/tomcat-native-1.2.17-src/native/.libs -jar tls-tomcat/target/tls-tomcat-*.jar
+Waiting 5s to give application time to start
+Starting Benchmarks
+bio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+6206 connections in 2.57s; 2414.79 connections/user sec, bytes read 0
+nio , Specific Cipher ECDHE-RSA-AES256-GCM-SHA384
+6269 connections in 2.59s; 2420.46 connections/user sec, bytes read 0
+bio, no specific cipher
+No CIPHER specified
+6230 connections in 2.59s; 2405.41 connections/user sec, bytes read 0
+nio, no specific cipher
+No CIPHER specified
+6231 connections in 2.60s; 2396.54 connections/user sec, bytes read 0
