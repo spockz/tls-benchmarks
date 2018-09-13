@@ -26,6 +26,7 @@
         <module>tls-tomcat</module>
         <module>tls-undertow</module>
         <module>shared-resources</module>
+        <module>tls-tomcat-9</module>
     </modules>
 
     <dependencyManagement>
@@ -33,6 +34,11 @@
             <dependency>
                 <groupId>me.alessandrovermeulen.tls</groupId>
                 <artifactId>shared-resources</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>me.alessandrovermeulen.tls</groupId>
+                <artifactId>tls-tomcat</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
