@@ -3,8 +3,9 @@
 ## Setup
 
 Using OpenSSL Binary /usr/local/Cellar/openssl/1.0.2o_2/bin/openssl, override with $OPENSSL_COMMAND
-Running benchmarks with OpenSSL version OpenSSL 1.0.2o  27 Mar 2018
+Running benchmarks with client OpenSSL version OpenSSL 1.0.2o  27 Mar 2018
 
+TCNative compiled with OpenSSL: 1.0.2o_2 and APR 1.6.3.
 
 ### Hardware
 MacOS 10.12.6
@@ -18,6 +19,7 @@ Results of the first run with just tomcat8 are in report/outcome-run1.csv. Some 
     * mutualTLS goes from ±173 connections/s to ±400 connections/s when using 2048 keys.
 * Client key size doesn't appear to be as significant as the server key size in terms of impact in connections/s
 * TLS Resumption doesn't appear to work (or enabled) out of the box when using Spring Boot + JSSE + Tomcat.
+    * Disabling jdk.tls.useExtendedMasterSecret does indeed enable re-use
 * No big difference between JRE versions when using OpenSSL
     * Not strange as no real application code is executed
 
@@ -31,3 +33,4 @@ Results of the first run with just tomcat8 are in report/outcome-run1.csv. Some 
     * Big message (10MB)
     * Huge message (100MB)
 * Try with Finagle/Netty
+* Include extendedMasterSecret in the test parameters and test with OpenSSL 1.1.0+ which has support for Extended Master Secret.
