@@ -11,10 +11,11 @@ resultsDir=results/${runID}
 mkdir ${resultsDir}
 
 function runBenchmarks() {
-    clientCert=$1
-    cipher=$2
-    resumption=$3
-    page=$4
+    openSslCommand=$1
+    clientCert=$2
+    cipher=$3
+    resumption=$4
+    page=$5
 
     cipherPart=""
     if [ ${cipher} != "-" ]; then
@@ -52,10 +53,10 @@ function runBenchmarkStep () {
     fi
 
     command="/usr/libexec/java_home -v $jreVersion --exec java ${libPaths} -Djdk.tls.useExtendedMasterSecret=${useExtendedMasterSecret} -Dserver.ssl.key-alias=$serverCertAlias -Dserver.ssl.client-auth=$clientAuth -jar $server/target/$server-*.jar"
-
+    serverLogFile="${resultsDir}/${jreVersion}-$tcNativeVersion-${useExtendedMasterSecret}-$serverCertAlias-$clientAuth-$server.log"
     echo "  Starting server $command"
 
-    $command 1 >$ 2 &
+    $command >${serverLogFile} 2>&1 &
     serverId=$!
     trap "echo \"Killing server\"; kill ${serverId}; exit 1" INT
 
@@ -64,10 +65,13 @@ function runBenchmarkStep () {
 
     echo "  Starting Benchmarks"
 
-    for page in ${pages[@]}; do
-        resultFile="${resultsDir}/$server%$jreVersion%${tcNativeVersion}%$clientAuth%$serverCertAlias%$clientCert%$cipher%$resumption%${useExtendedMasterSecret}%${page}"
-        errorResultFile="${resultFile}.err"
-        runBenchmarks ${clientCert} ${cipher} ${resumption} ${page} > ${resultFile} 2> ${errorResultFile}
+    for openSslCommand in ${openSslCommands[@]}; do
+        openSslVersion=$(${openSslCommand} version | cut -d " " -f 2)
+        for page in ${pages[@]}; do
+            resultFile="${resultsDir}/$server%$jreVersion%${tcNativeVersion}%$clientAuth%$serverCertAlias%$clientCert%$cipher%$resumption%${useExtendedMasterSecret}%${openSslVersion}%${page}"
+            errorResultFile="${resultFile}.err"
+            runBenchmarks ${openSslCommand} ${clientCert} ${cipher} ${resumption} ${page} > ${resultFile} 2> ${errorResultFile}
+        done
     done
 
 
@@ -81,7 +85,7 @@ echo "Cleaning and building applications"
 
 executionTime=30
 
-servers=( "tls-tomcat" "tls-tomcat-9" "tls-undertow" )
+servers=( "tls-tomcat" )
 tcNativeVersions=( "1.2.17-openssl-1.0.2" "1.2.17-openssl-1.1.1" "-" )
 jreVersions=( "1.8" "10" "11" )
 clientAuths=( "need" )
@@ -91,6 +95,7 @@ ciphers=( "-" )
 resumptions=( "new" "reuse" )
 useExtendedMasterSecret=( "true" "false" )
 pages=( "-" "small" "medium" "large" "  huge" )
+openSslCommands=( "$openSslCommand" "/usr/local/Cellar/openssl/1.0.2p/bin/openssl" )
 
 
 for server in ${servers[@]}; do
@@ -98,7 +103,7 @@ for server in ${servers[@]}; do
         for tcNativeVersion in ${tcNativeVersions[@]}; do
 
             # Only run benchmarks if native version empty or not empty and server contains tomcat
-            if [ $tcNativeVersion == "-" ] || [[ $server = *"tomcat"* ]]; then
+            if [ ${tcNativeVersion} == "-" ] || [[ $server = *"tomcat"* ]]; then
 
                 for clientAuth in ${clientAuths[@]}; do
 
@@ -106,7 +111,7 @@ for server in ${servers[@]}; do
                         for clientCert in ${clientCerts[@]}; do
                              for cipher in ${ciphers[@]}; do
                                 for resumption in ${resumptions[@]}; do
-                                    for enableExtendedMasterSecret in ${useExtendedMasterSecret[@]}; do
+                                        for enableExtendedMasterSecret in ${useExtendedMasterSecret[@]}; do
 
                                         echo "Testing Case combination: $server $jreVersion $clientAuth $serverCertAlias $clientCert $cipher $resumption $tcNativeVersion $enableExtendedMasterSecret"
 
@@ -115,13 +120,12 @@ for server in ${servers[@]}; do
                                             continue
                                         fi
 
-                                        if [ ${enableExtendedMasterSecret} == "true" ] || [ ${tcNativeVersion} != "-"} ]; then
-                                            runBenchmarkStep ${server} ${jreVersion} ${clientAuth} ${serverCertAlias} ${clientCert} ${cipher} ${resumption} ${tcNativeVersion} ${enableExtendedMasterSecret}
-                                        else
+                                        if [ ${enableExtendedMasterSecret} == "false" ] && [ ${tcNativeVersion} != "-"} ]; then
                                             echo " Skipping superfluous disabling of extended master secret when running with openssl"
+                                            continue
                                         fi
 
-
+                                        runBenchmarkStep ${server} ${jreVersion} ${clientAuth} ${serverCertAlias} ${clientCert} ${cipher} ${resumption} ${tcNativeVersion} ${enableExtendedMasterSecret}
                                     done
                                 done
                              done
@@ -135,22 +139,3 @@ for server in ${servers[@]}; do
         done
     done
 done
-
-#echo "Undertow Java 8"
-#runBenchmarkStep "/usr/libexec/java_home -v 1.8 --exec java -jar tls-undertow/target/tls-undertow-*.jar"
-#
-#echo "Undertow Java 10"
-#runBenchmarkStep "/usr/libexec/java_home -v 10 --exec java -jar tls-undertow/target/tls-undertow-*.jar"
-
-#echo "Tomcat 8.5.34 Java 8"
-#runBenchmarkStep "/usr/libexec/java_home -v 1.8 --exec java -jar tls-tomcat/target/tls-tomcat-*.jar"
-#
-#echo "Tomcat 8.5.34 Java 10"
-#runBenchmarkStep "/usr/libexec/java_home -v 10 --exec java -jar tls-tomcat/target/tls-tomcat-*.jar"
-#
-#echo "Tomcat 8.5.34 TCNative Java 8"
-#runBenchmarkStep "/usr/libexec/java_home -v 1.8 --exec java -Djava.library.path=/Users/alessandro/Downloads/tomcat-native-1.2.17-src/native/.libs -jar tls-tomcat/target/tls-tomcat-*.jar"
-#
-#echo "Tomcat 8.5.34 TCNative Java 10"
-#runBenchmarkStep "/usr/libexec/java_home -v 10 --exec java -Djava.library.path=/Users/alessandro/Downloads/tomcat-native-1.2.17-src/native/.libs -jar tls-tomcat/target/tls-tomcat-*.jar"
-#

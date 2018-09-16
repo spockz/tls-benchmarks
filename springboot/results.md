@@ -55,8 +55,8 @@ Results of the first run with just tomcat8 are in report/outcome-run1.csv. Some 
       ```
 * in the `springboot` directory run `./benchmark.sh`
 * To get to files in report:
-    * grep -lR "connections in 31 real" . | xargs tail -1 | pbcopy
+    * grep -lR "connections in" tls- | xargs tail -1 | pbcopy
     * paste into favorite editor
-    * Replace `==> ./(.*) <==\n(\d+).*\d+.*(\d+).*\n` with `$1,$2,$3`
+    * Replace `==> (.*) <==\n(\d+).* in (\d)+.*, (\d+).*\n` with `$1,$2,$3,$4`
     * Replace `%` with `,`
     * Add to the top `server,jreVersion,tcNativeVersion,clientAuth,serverCert,clientCert,cipher,resumption,enabledExtendedMasterSecret,page,connections/30s,bytes/connection`
